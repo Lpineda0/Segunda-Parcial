@@ -1,0 +1,97 @@
+﻿@page "/Colecciones"
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
+
+<h1>Formulario</h1>
+
+<h2>Persona</h2>
+<EditForm Model="laPersona" OnValidSubmit="Agregar">
+    <DataAnnotationsValidator />
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div class="col-10">
+            <InputText class="form-control" id="txtNombre" @bind-Value="laPersona.Nombre" />
+            <ValidationMessage For="@(()=>laPersona.Nombre)" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCorreo" class="col-2 col-form-label">Correo</label>
+        <div class="col-10">
+            <InputText class="form-control" id="txtCorreo" @bind-Value="laPersona.Correo" />
+            <ValidationMessage For="@(()=>laPersona.Correo)" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtCalificacion" class="col-2 col-form-label">Calificación</label>
+        <div class="col-10">
+            <InputNumber class="form-control" id="txtCalificacion" @bind-Value="laPersona.Calificacion" />
+            <ValidationMessage For="@(()=>laPersona.Calificacion)" />
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Enviar</button>
+</EditForm>
+
+<hr />
+
+@if (listaPersonas != null && listaPersonas.Count > 0)
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Correo</th>
+                <th scope="col">Calificación</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in listaPersonas)
+            {
+                <tr>
+                    <td>@item.Nombre</td>
+                    <td>@item.Correo</td>
+                    <td>@item.Calificacion</td>
+                    <td><button class="btn btn-danger" @onclick="() => Eliminar(item)">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Persona laPersona = new Persona();
+    private List<Persona> listaPersonas = new List<Persona>();
+
+    private void Agregar()
+    {
+        listaPersonas.Add(laPersona);
+        laPersona = new Persona();
+    }
+    private void Eliminar(Persona persona)
+    {
+        listaPersonas.Remove(persona);
+    }
+
+    public class Persona
+    {
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [MaxLength(100, ErrorMessage = "El nombre no debe exceder 100 caracteres")]
+        public string Nombre { get; set; }
+
+        [Required(ErrorMessage = "El correo es obligatorio")]
+        [MaxLength(70, ErrorMessage = "El correo no debe exceder 70 caracteres")]
+        [EmailAddress(ErrorMessage = "El correo debe ser válido")]
+        public string Correo { get; set; }
+
+        [Required(ErrorMessage = "La calificación es obligatoria")]
+        [Range(0, 10, ErrorMessage = "La calificación debe estar entre 0 y 10")]
+        public int Calificacion { get; set; }
+    }
+}

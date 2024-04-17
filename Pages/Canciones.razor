@@ -1,0 +1,133 @@
+﻿@page "/Canciones"
+@using System.Collections.Generic
+@using System.Linq
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<h3>Catálogo de Canciones</h3>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input class="form-control" @bind="nuevoTitulo" placeholder="Ingrese el título de la canción" />
+    </div>
+    <div class="col-md-6">
+        <button class="btn btn-primary" @onclick="AgregarTitulo">
+            Agregar Título
+            <i class="bi bi-plus"></i>
+        </button>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <input class="form-control" @bind="filtro" placeholder="Filtrar" @oninput="AplicarFiltro" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <button class="btn btn-secondary" @onclick="OrdenarAscendente">
+            Ordenar A-Z
+            <i class="bi bi-sort-alpha-up"></i>
+        </button>
+        <button class="btn btn-secondary" @onclick="OrdenarDescendente">
+            Ordenar Z-A
+            <i class="bi bi-sort-alpha-down"></i>
+        </button>
+    </div>
+</div>
+
+@if (cancionesFiltradas.Any())
+{
+    <ul class="list-group">
+        @foreach (var cancion in cancionesFiltradas)
+        {
+            <li class="list-group-item">
+                @if (cancionEditable == cancion)
+                {
+                    <input class="form-control" @bind="cancionEditada" />
+                    <button class="btn btn-success btn-sm" @onclick="() => GuardarEdicion(cancion)">Guardar</button>
+                }
+                else
+                {
+                    @cancion
+                    <button class="btn btn-warning btn-sm float-end" @onclick="() => EditarTitulo(cancion)">
+                        Editar
+                    </button>
+                }
+                <button class="btn btn-danger btn-sm float-end" @onclick="() => EliminarTitulo(cancion)">
+                    Eliminar
+                </button>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No se encontraron resultados.</p>
+}
+
+@code {
+    private string nuevoTitulo = "";
+    private List<string> canciones = new List<string>();
+    private List<string> cancionesFiltradas = new List<string>();
+    private string filtro = "";
+    private bool ordenAscendente = true;
+    private string cancionEditable = "";
+    private string cancionEditada = "";
+
+    private void AgregarTitulo()
+    {
+        if (!string.IsNullOrWhiteSpace(nuevoTitulo))
+        {
+            canciones.Add(nuevoTitulo);
+            AplicarFiltro();
+            nuevoTitulo = "";
+        }
+    }
+
+    private void EliminarTitulo(string titulo)
+    {
+        canciones.Remove(titulo);
+        AplicarFiltro();
+    }
+
+    private void OrdenarAscendente()
+    {
+        canciones = ordenAscendente ? canciones.OrderBy(x => x).ToList() : canciones.OrderByDescending(x => x).ToList();
+        ordenAscendente = !ordenAscendente;
+        AplicarFiltro();
+    }
+
+    private void OrdenarDescendente()
+    {
+        canciones = !ordenAscendente ? canciones.OrderBy(x => x).ToList() : canciones.OrderByDescending(x => x).ToList();
+        ordenAscendente = !ordenAscendente;
+        AplicarFiltro();
+    }
+
+    private void AplicarFiltro()
+    {
+        if (string.IsNullOrWhiteSpace(filtro))
+        {
+            cancionesFiltradas = new List<string>(canciones);
+        }
+        else
+        {
+            cancionesFiltradas = canciones.Where(x => x.Contains(filtro, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    private void EditarTitulo(string titulo)
+    {
+        cancionEditable = titulo;
+        cancionEditada = titulo;
+    }
+
+    private void GuardarEdicion(string titulo)
+    {
+        var index = cancionesFiltradas.IndexOf(titulo);
+        cancionesFiltradas[index] = cancionEditada;
+        cancionEditable = "";
+    }
+}

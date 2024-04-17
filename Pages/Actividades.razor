@@ -1,0 +1,95 @@
+﻿@page "/Actividades"
+<h3>Actividades</h3>
+@using System.Collections.Generic
+@using System.ComponentModel.DataAnnotations
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+
+<h1>Actividades a realizar</h1>
+
+<EditForm Model="nuevaActividad" OnValidSubmit="Agregar">
+    <DataAnnotationsValidator />
+    <div class="row mb-3">
+        <label for="txtNombre" class="col-2 col-form-label">Nombre</label>
+        <div class="col-10">
+            <InputText class="form-control" id="txtNombre" @bind-Value="nuevaActividad.Nombre" />
+            <ValidationMessage For="@(()=>nuevaActividad.Nombre)" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <label for="txtDescripcion" class="col-2 col-form-label">Descripción</label>
+        <div class="col-10">
+            <InputText class="form-control" id="txtDescripcion" @bind-Value="nuevaActividad.Descripcion" />
+            <ValidationMessage For="@(()=>nuevaActividad.Descripcion)" />
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Agregar Actividad</button>
+</EditForm>
+
+<hr />
+
+@if (mostrarActividades)
+{
+    @if (actividadesPorRealizar != null && actividadesPorRealizar.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var actividad in actividadesPorRealizar)
+                {
+                    <tr>
+                        <td>@actividad.Nombre</td>
+                        <td>@actividad.Descripcion</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => Eliminar(actividad)">
+                                <i class="bi bi-trash3-fill"></i> Eliminar Actividad
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No hay actividades pendientes.</p>
+    }
+}
+
+<button class="btn btn-secondary" @onclick="ToggleMostrarActividades">Mostrar/Ocultar Actividades
+    <i class="bi bi-eye-fill"></i>
+</button>
+
+@code {
+    private Actividad nuevaActividad = new Actividad();
+    private List<Actividad> actividadesPorRealizar = new List<Actividad>();
+    private bool mostrarActividades = true;
+
+    private void Agregar()
+    {
+        actividadesPorRealizar.Add(nuevaActividad);
+        nuevaActividad = new Actividad();
+    }
+
+    private void Eliminar(Actividad actividad)
+    {
+        actividadesPorRealizar.Remove(actividad);
+    }
+
+    private void ToggleMostrarActividades()
+    {
+        mostrarActividades = !mostrarActividades;
+    }
+
+    public class Actividad
+    {
+        public string Nombre { get; set; }
+        public string Descripcion { get; set; }
+    }
+}

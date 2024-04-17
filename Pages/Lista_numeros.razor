@@ -1,0 +1,101 @@
+﻿@page "/Lista_numeros"
+
+<style>
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f5f5f5;
+    }
+</style>
+
+<h3>Ingresa dos números</h3>
+
+<div>
+    <label>Primero:</label>
+    <input @bind="primerNumero" type="number" />
+</div>
+
+<div>
+    <label>Segundo:</label>
+    <input @bind="segundoNumero" type="number" />
+</div>
+
+<button @onclick="CalcularNumeros" class="btn btn-primary">Calcular</button>
+
+@if (numerosCalculados != null)
+{
+    <h4>Números pares:</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Números Pares</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var num in numerosCalculados.Pares)
+            {
+                <tr>
+                    <td>@num</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4>Números impares:</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Números Impares</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var num in numerosCalculados.Impares)
+            {
+                <tr>
+                    <td>@num</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+}
+
+@code {
+    int primerNumero;
+    int segundoNumero;
+    NumerosCalculados numerosCalculados;
+
+    async Task CalcularNumeros()
+    {
+        // Verifica que el primer número sea menor o igual que el segundo número
+        if (primerNumero > segundoNumero)
+        {
+            // Si no lo es, intercambia los valores
+            var temp = primerNumero;
+            primerNumero = segundoNumero;
+            segundoNumero = temp;
+        }
+
+        // Calcula los números pares e impares entre los dos números ingresados
+        var pares = new List<int>();
+        var impares = new List<int>();
+        for (int i = primerNumero; i <= segundoNumero; i++)
+        {
+            if (i % 2 == 0)
+            {
+                pares.Add(i);
+            }
+            else
+            {
+                impares.Add(i);
+            }
+        }
+
+        numerosCalculados = new NumerosCalculados { Pares = pares, Impares = impares };
+    }
+
+    public class NumerosCalculados
+    {
+        public List<int> Pares { get; set; }
+        public List<int> Impares { get; set; }
+    }
+}
+
